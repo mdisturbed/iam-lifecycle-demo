@@ -398,11 +398,66 @@
             <div class="demo-preview">
                 <h3><i class="fas fa-tachometer-alt"></i> Main Dashboard</h3>
                 <p>Comprehensive overview with real-time statistics, user management, and sync operations</p>
-                <!-- Placeholder for dashboard screenshot -->
-                <div style="background: #f8f9fa; height: 400px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; margin: 20px 0;">
-                    <div style="text-align: center;">
-                        <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>Dashboard Screenshot<br><small>Stats Cards • User Table • Quick Actions</small></p>
+                <!-- Dashboard Mockup -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 400px; border-radius: 10px; margin: 20px 0; padding: 20px; position: relative; overflow: hidden;">
+                    <!-- Simulated Dashboard UI -->
+                    <div style="background: rgba(255,255,255,0.95); border-radius: 10px; height: 100%; padding: 20px; position: relative;">
+                        <!-- Top Navigation Bar -->
+                        <div style="background: linear-gradient(45deg, #667eea, #764ba2); height: 60px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; padding: 0 20px; color: white; font-weight: bold;">
+                            <i class="fas fa-shield-alt" style="margin-right: 10px;"></i> IAM Lifecycle Dashboard
+                        </div>
+                        <!-- Stats Cards Row -->
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                            <div style="background: linear-gradient(45deg, #28a745, #20c997); color: white; padding: 15px; border-radius: 10px; flex: 1; text-align: center; font-size: 12px;">
+                                <div style="font-size: 24px; font-weight: bold;">247</div>
+                                <div>Total Users</div>
+                            </div>
+                            <div style="background: linear-gradient(45deg, #17a2b8, #138496); color: white; padding: 15px; border-radius: 10px; flex: 1; text-align: center; font-size: 12px;">
+                                <div style="font-size: 24px; font-weight: bold;">234</div>
+                                <div>Active Users</div>
+                            </div>
+                            <div style="background: linear-gradient(45deg, #dc3545, #c82333); color: white; padding: 15px; border-radius: 10px; flex: 1; text-align: center; font-size: 12px;">
+                                <div style="font-size: 24px; font-weight: bold;">13</div>
+                                <div>Terminated</div>
+                            </div>
+                            <div style="background: linear-gradient(45deg, #ffc107, #fd7e14); color: white; padding: 15px; border-radius: 10px; flex: 1; text-align: center; font-size: 12px;">
+                                <div style="font-size: 24px; font-weight: bold;">5</div>
+                                <div>Recent Runs</div>
+                            </div>
+                        </div>
+                        <!-- Users Table Mockup -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h3 style="margin: 0; font-size: 18px; color: #333;"><i class="fas fa-users"></i> Active Users</h3>
+                                <button style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 12px;">Add User</button>
+                            </div>
+                            <!-- Table Header -->
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; display: flex; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #666;">
+                                <div style="flex: 1;">Email</div>
+                                <div style="flex: 1;">Department</div>
+                                <div style="flex: 1;">Status</div>
+                                <div style="flex: 1;">Actions</div>
+                            </div>
+                            <!-- Sample Table Rows -->
+                            <div style="padding: 8px 10px; border-bottom: 1px solid #eee; display: flex; font-size: 11px;">
+                                <div style="flex: 1;">alice.nguyen@example.com</div>
+                                <div style="flex: 1;">Engineering</div>
+                                <div style="flex: 1;"><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">Active</span></div>
+                                <div style="flex: 1;"><i class="fas fa-edit" style="color: #667eea; margin-right: 5px;"></i><i class="fas fa-search" style="color: #17a2b8;"></i></div>
+                            </div>
+                            <div style="padding: 8px 10px; border-bottom: 1px solid #eee; display: flex; font-size: 11px;">
+                                <div style="flex: 1;">bob.diaz@example.com</div>
+                                <div style="flex: 1;">Finance</div>
+                                <div style="flex: 1;"><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">Active</span></div>
+                                <div style="flex: 1;"><i class="fas fa-edit" style="color: #667eea; margin-right: 5px;"></i><i class="fas fa-search" style="color: #17a2b8;"></i></div>
+                            </div>
+                            <div style="padding: 8px 10px; display: flex; font-size: 11px;">
+                                <div style="flex: 1;">chloe.park@example.com</div>
+                                <div style="flex: 1;">Engineering</div>
+                                <div style="flex: 1;"><span style="background: #ffc107; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">Review Required</span></div>
+                                <div style="flex: 1;"><i class="fas fa-edit" style="color: #667eea; margin-right: 5px;"></i><i class="fas fa-search" style="color: #17a2b8;"></i></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -410,11 +465,81 @@
             <div class="demo-preview">
                 <h3><i class="fas fa-user-edit"></i> Access Review Modal</h3>
                 <p>Interactive access review with current vs desired state comparison and manual adjustments</p>
-                <!-- Placeholder for access review screenshot -->
-                <div style="background: #f8f9fa; height: 400px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; margin: 20px 0;">
-                    <div style="text-align: center;">
-                        <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>Access Review Screenshot<br><small>Current Access • Desired Access • Recommended Actions</small></p>
+                <!-- Access Review Modal Mockup -->
+                <div style="background: rgba(0,0,0,0.7); height: 400px; border-radius: 10px; margin: 20px 0; padding: 20px; display: flex; align-items: center; justify-content: center;">
+                    <!-- Modal Content -->
+                    <div style="background: white; width: 90%; height: 90%; border-radius: 15px; padding: 25px; position: relative; overflow: hidden;">
+                        <!-- Modal Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;">
+                            <h3 style="margin: 0; font-size: 18px; color: #333;"><i class="fas fa-user-shield" style="color: #667eea; margin-right: 8px;"></i> Access Review Required: Chloe Park</h3>
+                            <span style="font-size: 20px; color: #999; cursor: pointer;">&times;</span>
+                        </div>
+                        <!-- Warning Banner -->
+                        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 12px;">
+                            <i class="fas fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
+                            <strong>Review Required:</strong> This user's access needs to be reviewed before proceeding.
+                        </div>
+                        <!-- User Info Section -->
+                        <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #333;"><i class="fas fa-user"></i> User Information</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 11px;">
+                                <div><strong>Email:</strong> chloe.park@example.com</div>
+                                <div><strong>Department:</strong> Engineering</div>
+                                <div><strong>Title:</strong> Contract Dev</div>
+                                <div><strong>Employment:</strong> Contractor</div>
+                                <div><strong>Location:</strong> US</div>
+                                <div><strong>Status:</strong> <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px;">Active</span></div>
+                            </div>
+                        </div>
+                        <!-- Access Comparison -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <!-- Current Access -->
+                            <div>
+                                <h4 style="margin: 0 0 10px 0; font-size: 12px; color: #333;"><i class="fas fa-eye"></i> Current Access</h4>
+                                <div style="background: rgba(220,53,69,0.1); padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;"><i class="fab fa-google"></i> Google Groups</div>
+                                    <span style="background: rgba(220,53,69,0.2); color: #dc3545; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">engineering@example.com</span>
+                                </div>
+                                <div style="background: rgba(220,53,69,0.1); padding: 10px; border-radius: 6px;">
+                                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;"><i class="fab fa-github"></i> GitHub Teams</div>
+                                    <span style="background: rgba(220,53,69,0.2); color: #dc3545; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">backend</span>
+                                </div>
+                            </div>
+                            <!-- Desired Access -->
+                            <div>
+                                <h4 style="margin: 0 0 10px 0; font-size: 12px; color: #333;"><i class="fas fa-bullseye"></i> Desired Access</h4>
+                                <div style="background: rgba(40,167,69,0.1); padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;"><i class="fab fa-google"></i> Google Groups</div>
+                                    <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">engineering@example.com</span>
+                                    <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">us-employees@example.com</span>
+                                </div>
+                                <div style="background: rgba(40,167,69,0.1); padding: 10px; border-radius: 6px;">
+                                    <div style="font-size: 10px; font-weight: bold; margin-bottom: 5px;"><i class="fab fa-github"></i> GitHub Teams</div>
+                                    <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">backend</span>
+                                    <span style="background: rgba(40,167,69,0.2); color: #28a745; padding: 2px 6px; border-radius: 12px; font-size: 9px; margin: 2px;">us-team</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Recommended Actions -->
+                        <div style="background: rgba(255,193,7,0.1); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #333;"><i class="fas fa-exclamation-triangle"></i> Recommended Actions</h4>
+                            <div style="font-size: 10px;">
+                                <div style="display: flex; align-items: center; padding: 4px 0; border-left: 3px solid #28a745; padding-left: 8px; margin: 2px 0;">
+                                    <i class="fas fa-plus" style="color: #28a745; margin-right: 6px; font-size: 8px;"></i>
+                                    <span>Add Google Group: us-employees@example.com</span>
+                                </div>
+                                <div style="display: flex; align-items: center; padding: 4px 0; border-left: 3px solid #28a745; padding-left: 8px; margin: 2px 0;">
+                                    <i class="fas fa-plus" style="color: #28a745; margin-right: 6px; font-size: 8px;"></i>
+                                    <span>Add GitHub Team: us-team</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Actions -->
+                        <div style="position: absolute; bottom: 20px; right: 25px; display: flex; gap: 10px;">
+                            <button style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 10px;">Cancel Review</button>
+                            <button style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 10px;">Preview Changes</button>
+                            <button style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 10px;">Complete Review</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -422,11 +547,79 @@
             <div class="demo-preview">
                 <h3><i class="fas fa-cogs"></i> RBAC Policy Management</h3>
                 <p>Create and manage department roles and conditional access rules</p>
-                <!-- Placeholder for RBAC screenshot -->
-                <div style="background: #f8f9fa; height: 400px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6c757d; margin: 20px 0;">
-                    <div style="text-align: center;">
-                        <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>RBAC Management Screenshot<br><small>Role Mappings • Conditional Rules • Policy Preview</small></p>
+                <!-- RBAC Management Mockup -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 400px; border-radius: 10px; margin: 20px 0; padding: 20px; position: relative; overflow: hidden;">
+                    <!-- Simulated RBAC UI -->
+                    <div style="background: rgba(255,255,255,0.95); border-radius: 10px; height: 100%; padding: 20px; position: relative;">
+                        <!-- RBAC Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #eee;">
+                            <h3 style="margin: 0; font-size: 18px; color: #333;"><i class="fas fa-cogs" style="color: #667eea; margin-right: 8px;"></i> RBAC Policies & Rules</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px;">+ Add Role</button>
+                                <button style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px;">+ Add Rule</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Department Role Mappings -->
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #333;"><i class="fas fa-users-cog"></i> Department Role Mappings</h4>
+                            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden;">
+                                <!-- Table Header -->
+                                <div style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 10px; display: flex; font-weight: bold; font-size: 11px;">
+                                    <div style="flex: 1;">Department</div>
+                                    <div style="flex: 1.5;">Google Groups</div>
+                                    <div style="flex: 1.5;">GitHub Teams</div>
+                                </div>
+                                <!-- Table Rows -->
+                                <div style="padding: 8px 10px; border-bottom: 1px solid #f0f0f0; display: flex; font-size: 10px;">
+                                    <div style="flex: 1; font-weight: bold;">Engineering</div>
+                                    <div style="flex: 1.5;"><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">engineering@example.com</span></div>
+                                    <div style="flex: 1.5;"><span style="background: #17a2b8; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">backend</span></div>
+                                </div>
+                                <div style="padding: 8px 10px; border-bottom: 1px solid #f0f0f0; display: flex; font-size: 10px;">
+                                    <div style="flex: 1; font-weight: bold;">Finance</div>
+                                    <div style="flex: 1.5;"><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">finance@example.com</span></div>
+                                    <div style="flex: 1.5; color: #666; font-style: italic;">None</div>
+                                </div>
+                                <div style="padding: 8px 10px; display: flex; font-size: 10px;">
+                                    <div style="flex: 1; font-weight: bold;">IT Department</div>
+                                    <div style="flex: 1.5;"><span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">it@example.com</span></div>
+                                    <div style="flex: 1.5; color: #666; font-style: italic;">None</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Conditional Rules -->
+                        <div>
+                            <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #333;"><i class="fas fa-code-branch"></i> Conditional Access Rules</h4>
+                            <div style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden;">
+                                <!-- Table Header -->
+                                <div style="background: linear-gradient(45deg, #28a745, #20c997); color: white; padding: 10px; display: flex; font-weight: bold; font-size: 11px;">
+                                    <div style="flex: 1;">Condition</div>
+                                    <div style="flex: 2;">Grants</div>
+                                </div>
+                                <!-- Table Rows -->
+                                <div style="padding: 8px 10px; border-bottom: 1px solid #f0f0f0; display: flex; font-size: 10px; align-items: center;">
+                                    <div style="flex: 1;"><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 9px;">location == "EU"</code></div>
+                                    <div style="flex: 2;"><span style="background: #ffc107; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">gdpr-training@example.com</span></div>
+                                </div>
+                                <div style="padding: 8px 10px; border-bottom: 1px solid #f0f0f0; display: flex; font-size: 10px; align-items: center;">
+                                    <div style="flex: 1;"><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 9px;">employment_type == "Contractor"</code></div>
+                                    <div style="flex: 2; color: #666; font-style: italic;">No grants</div>
+                                </div>
+                                <div style="padding: 8px 10px; border-bottom: 1px solid #f0f0f0; display: flex; font-size: 10px; align-items: center;">
+                                    <div style="flex: 1;"><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 9px;">department == "Sales"</code></div>
+                                    <div style="flex: 2;">
+                                        <span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">sales@example.com</span>
+                                        <span style="background: #17a2b8; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">sales-team</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 8px 10px; display: flex; font-size: 10px; align-items: center;">
+                                    <div style="flex: 1;"><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 9px;">department == "1004"</code></div>
+                                    <div style="flex: 2;"><span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; margin: 1px;">it@example.com</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
