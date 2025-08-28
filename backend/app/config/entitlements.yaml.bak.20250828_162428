@@ -1,0 +1,27 @@
+roles:
+  Engineering:
+    github:
+      teams:
+      - backend
+    google:
+      groups:
+      - engineering@example.com
+  Finance:
+    google:
+      groups:
+      - finance@example.com
+  TestDept:
+    github:
+      teams:
+      - test-team
+    google:
+      groups:
+      - test@example.com
+rules:
+- grant:
+    google:
+      groups:
+      - gdpr-training@example.com
+  when: location == "EU"
+- grant: {}
+  when: employment_type == "Contractor"

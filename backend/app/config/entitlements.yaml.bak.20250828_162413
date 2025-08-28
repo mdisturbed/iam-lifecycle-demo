@@ -1,0 +1,17 @@
+roles:
+  Engineering:
+    google:
+      groups: ["engineering@example.com"]
+    github:
+      teams: ["backend"]
+  Finance:
+    google:
+      groups: ["finance@example.com"]
+
+rules:
+  - when: 'location == "EU"'
+    grant:
+      google:
+        groups: ["gdpr-training@example.com"]
+  - when: 'employment_type == "Contractor"'
+    grant: {}

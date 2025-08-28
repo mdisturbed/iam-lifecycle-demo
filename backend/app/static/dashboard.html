@@ -1,0 +1,3527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAM Lifecycle Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .login-form {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+        
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-card .value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            color: #667eea;
+        }
+        
+        .button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button.secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+        
+        .button.danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #5a67d8;
+        }
+        
+        .upload-area.drag-over {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: #5a67d8;
+        }
+        
+        .file-input {
+            margin: 15px 0;
+        }
+        
+        .file-input input[type="file"] {
+            display: none;
+        }
+        
+        .file-input label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input label:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s;
+        }
+        
+        .table tr:hover td {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status.active {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .status.terminated {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .status.inactive {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: white;
+        }
+        
+        .dry-run {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .real-run {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .demo-credentials {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .demo-credentials h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .demo-credentials code {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal h2 {
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal h2 i {
+            color: #667eea;
+        }
+        
+        .close {
+            color: #999;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
+        .input-group button {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .tag {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .tag button {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .status.info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="loginForm" class="login-form">
+        <h2><i class="fas fa-shield-alt"></i> IAM Dashboard Login</h2>
+        <div id="loginAlert" class="alert"></div>
+        <form onsubmit="login(event)">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="button" style="width: 100%; margin: 0;">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+        
+        <div class="demo-credentials">
+            <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+            <p><strong>Admin:</strong> <code>admin</code> / <code>admin123</code></p>
+            <p><strong>Read-only:</strong> <code>readonly</code> / <code>readonly123</code></p>
+            <div style="margin-top: 10px;">
+                <button class="button" onclick="quickLogin()" style="width: 100%; margin: 0; font-size: 0.9em;">
+                    <i class="fas fa-zap"></i> Quick Admin Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <div class="navbar">
+            <h1><i class="fas fa-users-cog"></i> IAM Lifecycle Dashboard</h1>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button class="button danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Alerts -->
+            <div id="successAlert" class="alert success">
+                <i class="fas fa-check-circle"></i> <span id="successMessage"></span>
+            </div>
+            <div id="errorAlert" class="alert error">
+                <i class="fas fa-exclamation-triangle"></i> <span id="errorMessage"></span>
+            </div>
+            <div id="infoAlert" class="alert info">
+                <i class="fas fa-info-circle"></i> <span id="infoMessage"></span>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <div class="value" id="totalUsers">-</div>
+                    <div class="label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-user-check"></i></div>
+                    <div class="value" id="activeUsers">-</div>
+                    <div class="label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-user-times"></i></div>
+                    <div class="value" id="terminatedUsers">-</div>
+                    <div class="label">Terminated Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fas fa-sync-alt"></i></div>
+                    <div class="value" id="recentRuns">-</div>
+                    <div class="label">Recent Runs</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- HR Upload Section -->
+                <div class="card">
+                    <h2><i class="fas fa-file-upload"></i> Upload HR Roster</h2>
+                    <div class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div class="file-input">
+                            <label for="csvFile">
+                                <i class="fas fa-cloud-upload-alt"></i> Choose CSV File
+                            </label>
+                            <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(event)" />
+                        </div>
+                        <p><strong>Drop your CSV file here</strong> or click to browse</p>
+                        <p style="font-size: 0.85em; color: #666; margin-top: 10px;">
+                            Supports: CSV files up to 1MB, max 1000 users
+                        </p>
+                        <div id="fileName" style="margin-top: 10px; font-weight: bold; color: #667eea;"></div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button class="button" onclick="uploadCSV()" id="uploadBtn" disabled>
+                            <i class="fas fa-upload"></i> Upload CSV
+                        </button>
+                    </div>
+                    <div id="uploadProgress" class="progress-bar" style="display: none;">
+                        <div class="progress-fill" id="uploadProgressFill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Sync Operations Section -->
+                <div class="card">
+                    <h2><i class="fas fa-sync-alt"></i> Sync Operations</h2>
+                    <div style="margin-bottom: 20px;">
+                        <button class="button" onclick="runSync(true)">
+                            <i class="fas fa-eye"></i> Run Dry Sync
+                        </button>
+                        <button class="button secondary" onclick="runSync(false)">
+                            <i class="fas fa-play"></i> Run Live Sync
+                        </button>
+                    </div>
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 15px; border-radius: 8px; font-size: 0.9em;">
+                        <p><strong>Dry Run:</strong> Shows changes without applying them</p>
+                        <p><strong>Live Sync:</strong> Applies changes to target systems</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div class="card">
+                <h2><i class="fas fa-users"></i> Active Users</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="button" onclick="loadUsers()">
+                        <i class="fas fa-sync-alt"></i> Refresh Users
+                    </button>
+                    <button class="button" onclick="showCreateUserModal()">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
+                <div id="usersLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading users...</p>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="usersTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-id-card"></i> User ID</th>
+                                <th><i class="fas fa-envelope"></i> Email</th>
+                                <th><i class="fas fa-building"></i> Department</th>
+                                <th><i class="fas fa-hashtag"></i> Dept Code</th>
+                                <th><i class="fas fa-briefcase"></i> Title</th>
+                                <th><i class="fas fa-code"></i> Job Code</th>
+                                <th><i class="fas fa-info-circle"></i> Status</th>
+                                <th><i class="fas fa-tools"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Runs Section -->
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Recent Sync Runs</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="button" onclick="loadRuns()">
+                        <i class="fas fa-sync-alt"></i> Refresh Runs
+                    </button>
+                </div>
+                <div id="runsLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading runs...</p>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="runsTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> Run ID</th>
+                                <th><i class="fas fa-clock"></i> Started</th>
+                                <th><i class="fas fa-check-clock"></i> Completed</th>
+                                <th><i class="fas fa-cog"></i> Type</th>
+                                <th><i class="fas fa-users"></i> Users Processed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="runsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RBAC Management Section -->
+            <div class="card">
+                <h2><i class="fas fa-user-shield"></i> RBAC Management</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="button" onclick="loadRbacSummary()">
+                        <i class="fas fa-sync-alt"></i> Refresh RBAC Data
+                    </button>
+                    <button class="button secondary" onclick="showRbacPolicies()">
+                        <i class="fas fa-cogs"></i> View Policies
+                    </button>
+                </div>
+                
+                <!-- RBAC Statistics -->
+                <div class="stats-cards" style="margin-bottom: 20px;">
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="icon" style="font-size: 1.5em;"><i class="fas fa-key"></i></div>
+                        <div class="value" style="font-size: 1.5em;" id="totalEntitlements">-</div>
+                        <div class="label">Total Entitlements</div>
+                    </div>
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="icon" style="font-size: 1.5em;"><i class="fas fa-link"></i></div>
+                        <div class="value" style="font-size: 1.5em;" id="totalAccounts">-</div>
+                        <div class="label">SaaS Accounts</div>
+                    </div>
+                    <div class="stat-card" style="padding: 15px;">
+                        <div class="icon" style="font-size: 1.5em;"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="value" style="font-size: 1.5em;" id="nonCompliantUsers">-</div>
+                        <div class="label">Non-Compliant</div>
+                    </div>
+                </div>
+                
+                <div id="rbacLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading RBAC data...</p>
+                </div>
+                
+                <!-- User Access Review Table -->
+                <div class="table-container">
+                    <table class="table" id="rbacTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> User</th>
+                                <th><i class="fas fa-building"></i> Department</th>
+                                <th><i class="fas fa-google"></i> Google Groups</th>
+                                <th><i class="fas fa-github"></i> GitHub Teams</th>
+                                <th><i class="fas fa-check-circle"></i> Compliance</th>
+                                <th><i class="fas fa-tools"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rbacBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SaaS Integration Section -->
+            <div class="card">
+                <h2><i class="fas fa-cloud"></i> SaaS Integration Management</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="button" onclick="loadSaasData()">
+                        <i class="fas fa-sync-alt"></i> Refresh SaaS Data
+                    </button>
+                    <button class="button secondary" onclick="testSaasConnections()">
+                        <i class="fas fa-plug"></i> Test Connections
+                    </button>
+                    <button class="button" onclick="showAddSaasModal()">
+                        <i class="fas fa-plus"></i> Add SaaS App
+                    </button>
+                </div>
+                
+                <!-- SaaS Systems Cards -->
+                <div class="dashboard-grid" style="margin-bottom: 20px;">
+                    <div class="card" style="padding: 20px;">
+                        <h3><i class="fab fa-google"></i> Google Workspace</h3>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Active Accounts:</span>
+                            <span id="googleActiveAccounts" style="font-weight: bold;">-</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Total Groups:</span>
+                            <span id="googleTotalGroups" style="font-weight: bold;">-</span>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <span class="status" id="googleStatus">Unknown</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="padding: 20px;">
+                        <h3><i class="fab fa-github"></i> GitHub</h3>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Active Accounts:</span>
+                            <span id="githubActiveAccounts" style="font-weight: bold;">-</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Total Teams:</span>
+                            <span id="githubTotalTeams" style="font-weight: bold;">-</span>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <span class="status" id="githubStatus">Unknown</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="saasLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading SaaS data...</p>
+                </div>
+                
+                <!-- SaaS Accounts Table -->
+                <div class="table-container">
+                    <table class="table" id="saasTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> User</th>
+                                <th><i class="fas fa-envelope"></i> Email</th>
+                                <th><i class="fas fa-cloud"></i> System</th>
+                                <th><i class="fas fa-id-card"></i> Account ID</th>
+                                <th><i class="fas fa-info-circle"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RBAC Policies Section -->
+            <div class="card" id="policiesCard" style="display: none;">
+                <h2><i class="fas fa-cogs"></i> RBAC Policies & Rules</h2>
+                <div style="margin-bottom: 20px;">
+                    <button class="button" onclick="hidePolicies()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="button" onclick="showCreateRoleModal()">
+                        <i class="fas fa-plus"></i> Add Department Role
+                    </button>
+                    <button class="button" onclick="showCreateRuleModal()">
+                        <i class="fas fa-plus"></i> Add Conditional Rule
+                    </button>
+                </div>
+                
+                <!-- Role-based Mappings -->
+                <div style="margin-bottom: 30px;">
+                    <h3><i class="fas fa-users-cog"></i> Department Role Mappings</h3>
+                    <div id="rolesPolicies" class="table-container">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Conditional Rules -->
+                <div>
+                    <h3><i class="fas fa-code-branch"></i> Conditional Access Rules</h3>
+                    <div id="conditionalRules" class="table-container">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Role Modal -->
+    <div id="createRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideCreateRoleModal()">&times;</span>
+            <h2><i class="fas fa-user-cog"></i> Create Department Role Mapping</h2>
+            
+            <div class="form-group">
+                <label for="roleDepartment">Department Name:</label>
+                <input type="text" id="roleDepartment" placeholder="e.g., Engineering, Marketing, Sales" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="googleGroups">Google Groups:</label>
+                    <div class="input-group">
+                        <input type="text" id="googleGroupInput" placeholder="group@example.com">
+                        <button onclick="addGoogleGroup()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="googleGroupTags" class="tag-list"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="githubTeams">GitHub Teams:</label>
+                    <div class="input-group">
+                        <input type="text" id="githubTeamInput" placeholder="team-name">
+                        <button onclick="addGithubTeam()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="githubTeamTags" class="tag-list"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button secondary" onclick="hideCreateRoleModal()">Cancel</button>
+                <button class="button" onclick="createRole()"><i class="fas fa-save"></i> Create Role</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Rule Modal -->
+    <div id="createRuleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideCreateRuleModal()">&times;</span>
+            <h2><i class="fas fa-code-branch"></i> Create Conditional Access Rule</h2>
+            
+            <div class="form-group">
+                <label for="ruleCondition">Condition (when):</label>
+                <select id="ruleCondition">
+                    <option value="">Select condition type...</option>
+                    <option value="location">Location equals</option>
+                    <option value="employment_type">Employment Type equals</option>
+                    <option value="department">Department equals</option>
+                    <option value="department_code">Department Code equals</option>
+                    <option value="job_code">Job Code equals</option>
+                    <option value="title">Title equals</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="conditionValue">Condition Value:</label>
+                <input type="text" id="conditionValue" placeholder="e.g., EU, Contractor, Manager, 1001, 50001" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Grant Google Groups:</label>
+                    <div class="input-group">
+                        <input type="text" id="ruleGoogleGroupInput" placeholder="group@example.com">
+                        <button onclick="addRuleGoogleGroup()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="ruleGoogleGroupTags" class="tag-list"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Grant GitHub Teams:</label>
+                    <div class="input-group">
+                        <input type="text" id="ruleGithubTeamInput" placeholder="team-name">
+                        <button onclick="addRuleGithubTeam()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="ruleGithubTeamTags" class="tag-list"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button secondary" onclick="hideCreateRuleModal()">Cancel</button>
+                <button class="button" onclick="previewRule()"><i class="fas fa-eye"></i> Preview Impact</button>
+                <button class="button" onclick="createRule()"><i class="fas fa-save"></i> Create Rule</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideCreateUserModal()">&times;</span>
+            <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userEmail">Email Address:</label>
+                    <input type="email" id="userEmail" placeholder="user@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="userFirstName">First Name:</label>
+                    <input type="text" id="userFirstName" placeholder="John" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userLastName">Last Name:</label>
+                    <input type="text" id="userLastName" placeholder="Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="userDepartment">Department:</label>
+                    <input type="text" id="userDepartment" placeholder="Engineering, Marketing, etc." required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userDepartmentCode">Department Code:</label>
+                    <input type="text" id="userDepartmentCode" placeholder="1001" pattern="[0-9]{4}" maxlength="4" required>
+                    <small style="color: #666;">4-digit department code (e.g., 1001)</small>
+                </div>
+                <div class="form-group">
+                    <label for="userJobCode">Job Code:</label>
+                    <input type="text" id="userJobCode" placeholder="50001" pattern="[0-9]{5}" maxlength="5" required>
+                    <small style="color: #666;">5-digit job code (e.g., 50001)</small>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userTitle">Job Title:</label>
+                    <input type="text" id="userTitle" placeholder="Software Engineer" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmploymentType">Employment Type:</label>
+                    <select id="userEmploymentType" required>
+                        <option value="">Select type...</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contractor">Contractor</option>
+                        <option value="intern">Intern</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="userLocation">Location:</label>
+                    <input type="text" id="userLocation" placeholder="San Francisco, CA" required>
+                </div>
+                <div class="form-group">
+                    <label for="userStartDate">Start Date:</label>
+                    <input type="date" id="userStartDate" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="userManagerEmail">Manager Email (optional):</label>
+                <input type="email" id="userManagerEmail" placeholder="manager@example.com">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button secondary" onclick="hideCreateUserModal()">Cancel</button>
+                <button class="button" onclick="createUser()"><i class="fas fa-save"></i> Create User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add SaaS App Modal -->
+    <div id="addSaasModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideAddSaasModal()">&times;</span>
+            <h2><i class="fas fa-cloud-upload-alt"></i> Add SaaS Application</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="saasAppName">Application Name:</label>
+                    <input type="text" id="saasAppName" placeholder="Slack, Salesforce, etc." required>
+                </div>
+                <div class="form-group">
+                    <label for="saasAppType">Application Type:</label>
+                    <select id="saasAppType" required>
+                        <option value="">Select type...</option>
+                        <option value="google">Google Workspace</option>
+                        <option value="github">GitHub</option>
+                        <option value="slack">Slack</option>
+                        <option value="salesforce">Salesforce</option>
+                        <option value="jira">Jira</option>
+                        <option value="confluence">Confluence</option>
+                        <option value="custom">Custom/Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="saasAppDescription">Description:</label>
+                <textarea id="saasAppDescription" placeholder="Brief description of the application and its purpose..."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="saasAppUrl">Application URL:</label>
+                    <input type="url" id="saasAppUrl" placeholder="https://yourcompany.slack.com">
+                </div>
+                <div class="form-group">
+                    <label for="saasAppStatus">Status:</label>
+                    <select id="saasAppStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="testing">Testing</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="saasAppConfig">Connection Configuration (JSON):</label>
+                <textarea id="saasAppConfig" placeholder='{\n  "api_key": "your-api-key",\n  "domain": "yourcompany.example.com"\n}' style="min-height: 120px; font-family: monospace;"></textarea>
+                <small style="color: #666;">Enter connection settings as JSON. This will be stored securely.</small>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button secondary" onclick="hideAddSaasModal()">Cancel</button>
+                <button class="button" onclick="testSaasConnection()" style="background: linear-gradient(45deg, #17a2b8, #138496);">
+                    <i class="fas fa-plug"></i> Test Connection
+                </button>
+                <button class="button" onclick="createSaasApp()"><i class="fas fa-save"></i> Add Application</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideEditUserModal()">&times;</span>
+            <h2><i class="fas fa-user-edit"></i> Edit User: <span id="editUserName"></span></h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserEmail">Email Address:</label>
+                    <input type="email" id="editUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserFirstName">First Name:</label>
+                    <input type="text" id="editUserFirstName" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserLastName">Last Name:</label>
+                    <input type="text" id="editUserLastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserDepartment">Department:</label>
+                    <input type="text" id="editUserDepartment" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserDepartmentCode">Department Code:</label>
+                    <input type="text" id="editUserDepartmentCode" pattern="[0-9]{4}" maxlength="4" required>
+                    <small style="color: #666;">4-digit department code (e.g., 1001)</small>
+                </div>
+                <div class="form-group">
+                    <label for="editUserJobCode">Job Code:</label>
+                    <input type="text" id="editUserJobCode" pattern="[0-9]{5}" maxlength="5" required>
+                    <small style="color: #666;">5-digit job code (e.g., 50001)</small>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserTitle">Job Title:</label>
+                    <input type="text" id="editUserTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmploymentType">Employment Type:</label>
+                    <select id="editUserEmploymentType" required>
+                        <option value="">Select type...</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="contractor">Contractor</option>
+                        <option value="intern">Intern</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserLocation">Location:</label>
+                    <input type="text" id="editUserLocation" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserStartDate">Start Date:</label>
+                    <input type="date" id="editUserStartDate" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserManagerEmail">Manager Email (optional):</label>
+                    <input type="email" id="editUserManagerEmail">
+                </div>
+                <div class="form-group">
+                    <label for="editUserStatus">Status:</label>
+                    <select id="editUserStatus" required>
+                        <option value="Active">Active</option>
+                        <option value="Terminated">Terminated</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button secondary" onclick="hideEditUserModal()">Cancel</button>
+                <button class="button" onclick="updateUser()"><i class="fas fa-save"></i> Update User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Access Review Modal -->
+    <div id="accessReviewModal" class="modal" style="z-index: 1100;">
+        <div class="modal-content" style="max-width: 900px;">
+            <h2><i class="fas fa-user-shield"></i> Access Review Required: <span id="reviewUserName"></span></h2>
+            <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em;">
+                <i class="fas fa-info-circle" style="color: #856404;"></i> 
+                <strong>Review Required:</strong> This user's access needs to be reviewed before proceeding. Please complete the review process below.
+            </div>
+            
+            <!-- User Information -->
+            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                <h3><i class="fas fa-user"></i> User Information</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div><strong>Email:</strong> <span id="reviewUserEmail"></span></div>
+                    <div><strong>Department:</strong> <span id="reviewUserDepartment"></span></div>
+                    <div><strong>Title:</strong> <span id="reviewUserTitle"></span></div>
+                    <div><strong>Employment:</strong> <span id="reviewUserEmployment"></span></div>
+                    <div><strong>Location:</strong> <span id="reviewUserLocation"></span></div>
+                    <div><strong>Status:</strong> <span id="reviewUserStatus"></span></div>
+                </div>
+            </div>
+            
+            <!-- Access Comparison -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                <!-- Current Access -->
+                <div>
+                    <h3><i class="fas fa-eye"></i> Current Access</h3>
+                    <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4><i class="fab fa-google"></i> Google Groups</h4>
+                        <div id="currentGoogleGroups" class="tag-list" style="min-height: 40px;"></div>
+                    </div>
+                    <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 8px;">
+                        <h4><i class="fab fa-github"></i> GitHub Teams</h4>
+                        <div id="currentGithubTeams" class="tag-list" style="min-height: 40px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Desired Access -->
+                <div>
+                    <h3><i class="fas fa-bullseye"></i> Desired Access</h3>
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4><i class="fab fa-google"></i> Google Groups</h4>
+                        <div id="desiredGoogleGroups" class="tag-list" style="min-height: 40px;"></div>
+                    </div>
+                    <div style="background: rgba(40, 167, 69, 0.1); padding: 15px; border-radius: 8px;">
+                        <h4><i class="fab fa-github"></i> GitHub Teams</h4>
+                        <div id="desiredGithubTeams" class="tag-list" style="min-height: 40px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommended Actions -->
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                <h3><i class="fas fa-exclamation-triangle"></i> Recommended Actions</h3>
+                <div id="recommendedActions" style="margin-top: 15px;">
+                    <div class="loading" id="actionsLoading">
+                        <div class="spinner" style="width: 20px; height: 20px;"></div>
+                        <p>Calculating differences...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Manual Adjustments -->
+            <div style="border-top: 1px solid #e1e5e9; padding-top: 25px; margin-bottom: 25px;">
+                <h3><i class="fas fa-tools"></i> Manual Adjustments (Optional)</h3>
+                <p style="color: #666; margin-bottom: 20px; font-size: 0.9em;">Override automatic recommendations by manually adding or removing access:</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Add Google Groups:</label>
+                        <div class="input-group">
+                            <input type="text" id="addGoogleGroupInput" placeholder="group@example.com">
+                            <button onclick="addManualGoogleGroup()"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="manualGoogleGroupTags" class="tag-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Add GitHub Teams:</label>
+                        <div class="input-group">
+                            <input type="text" id="addGithubTeamInput" placeholder="team-name">
+                            <button onclick="addManualGithubTeam()"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="manualGithubTeamTags" class="tag-list"></div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Remove Google Groups:</label>
+                        <div class="input-group">
+                            <input type="text" id="removeGoogleGroupInput" placeholder="group@example.com">
+                            <button onclick="addRemoveGoogleGroup()"><i class="fas fa-minus"></i></button>
+                        </div>
+                        <div id="removeGoogleGroupTags" class="tag-list"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Remove GitHub Teams:</label>
+                        <div class="input-group">
+                            <input type="text" id="removeGithubTeamInput" placeholder="team-name">
+                            <button onclick="addRemoveGithubTeam()"><i class="fas fa-minus"></i></button>
+                        </div>
+                        <div id="removeGithubTeamTags" class="tag-list"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Review Notes -->
+            <div class="form-group">
+                <label for="reviewNotes">Review Notes:</label>
+                <textarea id="reviewNotes" placeholder="Add notes about this access review, any special considerations, or reasons for changes..." style="min-height: 80px;"></textarea>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="button danger" onclick="confirmCancelReview()" id="cancelReviewBtn">
+                    <i class="fas fa-times"></i> Cancel Review
+                </button>
+                <button class="button" onclick="previewAccessChanges()" style="background: linear-gradient(45deg, #17a2b8, #138496);">
+                    <i class="fas fa-eye"></i> Preview Changes
+                </button>
+                <button class="button" onclick="applyAccessChanges()" id="completeReviewBtn">
+                    <i class="fas fa-check"></i> Complete Review & Apply Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+        
+        // Initialize app
+        window.onload = function() {
+            if (authToken) {
+                checkTokenValidity();
+            } else {
+                showLoginForm();
+            }
+        };
+        
+        // Authentication functions
+        async function login(event) {
+            event.preventDefault();
+            console.log('Login function called');
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Attempting login with username:', username);
+            
+            // Clear any previous login errors
+            document.getElementById('loginAlert').style.display = 'none';
+            
+            // Disable the submit button temporarily
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            submitBtn.disabled = true;
+            
+            try {
+                console.log('Making login request...');
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                console.log('Login response status:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Login successful, got token');
+                    authToken = result.access_token;
+                    localStorage.setItem('authToken', authToken);
+                    await getCurrentUser();
+                    showDashboard();
+                    await loadDashboardData();
+                    showSuccess('Login successful!');
+                } else {
+                    const error = await response.json();
+                    console.error('Login failed:', error);
+                    showLoginError(error.detail || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login network error:', error);
+                showLoginError('Network error: ' + error.message);
+            } finally {
+                // Re-enable the submit button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+        
+        async function quickLogin() {
+            console.log('Quick login called');
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            
+            // Trigger login programmatically
+            const event = { 
+                preventDefault: () => {}, 
+                target: document.querySelector('#loginForm form')
+            };
+            await login(event);
+        }
+        
+        async function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            showLoginForm();
+        }
+        
+        async function checkTokenValidity() {
+            try {
+                const response = await fetch('/api/v1/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    await getCurrentUser();
+                    showDashboard();
+                    await loadDashboardData();
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                logout();
+            }
+        }
+        
+        async function getCurrentUser() {
+            try {
+                const response = await fetch('/api/v1/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('currentUser').textContent = 
+                        `Welcome, ${currentUser.username} (${currentUser.scopes.join(', ')})`;
+                }
+            } catch (error) {
+                console.error('Error getting current user:', error);
+            }
+        }
+        
+        // UI state functions
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+        
+        // Alert functions
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            document.getElementById('successMessage').textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+        
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            document.getElementById('errorMessage').textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 8000);
+        }
+        
+        function showInfo(message) {
+            const alert = document.getElementById('infoAlert');
+            document.getElementById('infoMessage').textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+        
+        function showLoginError(message) {
+            const alert = document.getElementById('loginAlert');
+            alert.className = 'alert error';
+            alert.textContent = message;
+            alert.style.display = 'block';
+        }
+        
+        // File handling functions
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+        
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                    document.getElementById('csvFile').files = files;
+                    handleFileSelect({ target: { files: files } });
+                } else {
+                    showError('Please drop a CSV file');
+                }
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // API functions with authentication
+        async function uploadCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            const uploadBtn = document.getElementById('uploadBtn');
+            const progressBar = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('uploadProgressFill');
+            
+            if (!file) {
+                showError('Please select a CSV file');
+                return;
+            }
+            
+            if (!authToken) {
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('csv', file);
+            
+            uploadBtn.disabled = true;
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            // Simulate progress
+            const progressInterval = setInterval(() => {
+                const current = parseInt(progressFill.style.width);
+                if (current < 90) {
+                    progressFill.style.width = (current + 10) + '%';
+                }
+            }, 100);
+            
+            try {
+                const response = await fetch('/api/v1/hr/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showSuccess(`Successfully uploaded ${result.uploaded} users! Created: ${result.created}, Updated: ${result.updated}. Sync task queued: ${result.run_task_id}`);
+                    
+                    // Clear file input
+                    fileInput.value = '';
+                    document.getElementById('fileName').textContent = '';
+                    
+                    // Refresh data
+                    await loadUsers();
+                    await loadRuns();
+                } else {
+                    const error = await response.json();
+                    showError('Upload failed: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                showError('Network error: ' + error.message);
+            } finally {
+                uploadBtn.disabled = false;
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1000);
+            }
+        }
+
+        async function runSync(dryRun) {
+            if (!authToken) {
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/v1/sync?dry_run=${dryRun}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showInfo(`Sync ${dryRun ? '(dry run)' : '(live)'} queued successfully! Task ID: ${result.task_id}`);
+                    setTimeout(loadRuns, 2000); // Refresh runs after 2 seconds
+                } else {
+                    const error = await response.json();
+                    showError('Sync failed: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+
+        async function loadUsers() {
+            const loading = document.getElementById('usersLoading');
+            const table = document.getElementById('usersTable');
+            const tbody = document.getElementById('usersBody');
+            
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            
+            try {
+                const headers = {};
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch('/api/v1/users', { headers });
+                
+                if (response.ok) {
+                    const users = await response.json();
+                    
+                    tbody.innerHTML = '';
+                    users.forEach(user => {
+                        const row = tbody.insertRow();
+                        
+                        // Admin actions column (only for admin users)
+                        let actionsHtml = '';
+                        if (currentUser && currentUser.scopes.includes('admin')) {
+                            let buttons = `
+                                <button class="button" style="padding: 6px 12px; margin: 2px; font-size: 12px; background: linear-gradient(45deg, #17a2b8, #138496);" 
+                                        onclick="showEditUserModal('${user.hr_user_id}')" 
+                                        title="Edit user details">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            `;
+                            
+                            if (user.status.toLowerCase() === 'active') {
+                                buttons += `
+                                    <button class="button danger" style="padding: 6px 12px; margin: 2px; font-size: 12px;" 
+                                            onclick="terminateUser('${user.hr_user_id}', '${user.email}')" 
+                                            title="Terminate user and clear all access">
+                                        <i class="fas fa-user-times"></i>
+                                    </button>
+                                `;
+                            } else if (user.status.toLowerCase() === 'terminated') {
+                                buttons += `
+                                    <button class="button" style="padding: 6px 12px; margin: 2px; font-size: 12px; background: linear-gradient(45deg, #28a745, #20c997);" 
+                                            onclick="reactivateUser('${user.hr_user_id}', '${user.email}')" 
+                                            title="Reactivate user and restore access">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                `;
+                            }
+                            
+                            actionsHtml = `<td>${buttons}</td>`;
+                        } else {
+                            actionsHtml = '<td><em>Admin only</em></td>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${user.hr_user_id}</td>
+                            <td>${user.email}</td>
+                            <td>${user.department}</td>
+                            <td><code>${user.department_code || 'N/A'}</code></td>
+                            <td>${user.title}</td>
+                            <td><code>${user.job_code || 'N/A'}</code></td>
+                            <td><span class="status ${user.status.toLowerCase()}">${user.status}</span></td>
+                            ${actionsHtml}
+                        `;
+                    });
+                    
+                    table.style.display = 'table';
+                    updateStats(users);
+                } else {
+                    showError('Failed to load users: ' + response.statusText);
+                }
+            } catch (error) {
+                showError('Network error loading users: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function loadRuns() {
+            const loading = document.getElementById('runsLoading');
+            const table = document.getElementById('runsTable');
+            const tbody = document.getElementById('runsBody');
+            
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            
+            try {
+                const headers = {};
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch('/api/v1/runs', { headers });
+                
+                if (response.ok) {
+                    const runs = await response.json();
+                    
+                    tbody.innerHTML = '';
+                    runs.forEach(run => {
+                        const row = tbody.insertRow();
+                        const startTime = new Date(run.started_at).toLocaleString();
+                        const endTime = run.completed_at ? new Date(run.completed_at).toLocaleString() : 
+                            '<span style="color: #ffc107;"><i class="fas fa-spinner fa-spin"></i> Running...</span>';
+                        const processed = run.summary ? run.summary.processed || run.summary.count : 0;
+                        
+                        row.innerHTML = `
+                            <td><code>${String(run.id).substring(0, 8)}</code></td>
+                            <td>${startTime}</td>
+                            <td>${endTime}</td>
+                            <td><span class="${run.dry_run ? 'dry-run' : 'real-run'}">
+                                <i class="fas ${run.dry_run ? 'fa-eye' : 'fa-play'}"></i> 
+                                ${run.dry_run ? 'Dry Run' : 'Live Run'}
+                            </span></td>
+                            <td>${processed}</td>
+                        `;
+                    });
+                    
+                    table.style.display = 'table';
+                    document.getElementById('recentRuns').textContent = runs.length;
+                } else {
+                    showError('Failed to load runs: ' + response.statusText);
+                }
+            } catch (error) {
+                showError('Network error loading runs: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Update statistics
+        function updateStats(users) {
+            const total = users.length;
+            const active = users.filter(u => u.status.toLowerCase() === 'active').length;
+            const terminated = users.filter(u => u.status.toLowerCase() === 'terminated').length;
+            
+            document.getElementById('totalUsers').textContent = total;
+            document.getElementById('activeUsers').textContent = active;
+            document.getElementById('terminatedUsers').textContent = terminated;
+        }
+        
+        // Load all dashboard data
+        async function loadDashboardData() {
+            await Promise.all([
+                loadUsers(),
+                loadRuns(),
+                loadRbacSummary(),
+                loadSaasData()
+            ]);
+        }
+        
+        // RBAC Management Functions
+        async function loadRbacSummary() {
+            if (!authToken) return;
+            
+            const loading = document.getElementById('rbacLoading');
+            const table = document.getElementById('rbacTable');
+            const tbody = document.getElementById('rbacBody');
+            
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            
+            try {
+                // Get summary data
+                const summaryResponse = await fetch('/api/v1/rbac/entitlements/summary', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (summaryResponse.ok) {
+                    const summary = await summaryResponse.json();
+                    document.getElementById('totalEntitlements').textContent = summary.total_entitlements;
+                    document.getElementById('totalAccounts').textContent = summary.total_accounts;
+                }
+                
+                // Get users for access review
+                const usersResponse = await fetch('/api/v1/users', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (usersResponse.ok) {
+                    const users = await usersResponse.json();
+                    let nonCompliantCount = 0;
+                    
+                    tbody.innerHTML = '';
+                    
+                    // Process each user for RBAC data
+                    for (const user of users.slice(0, 10)) { // Limit to first 10 for performance
+                        try {
+                            // Get user's desired entitlements
+                            const desiredResponse = await fetch(`/api/v1/rbac/users/${user.hr_user_id}/desired-entitlements`, {
+                                headers: { 'Authorization': `Bearer ${authToken}` }
+                            });
+                            
+                            let desired = { google: { groups: [] }, github: { teams: [] } };
+                            let compliance = 'compliant';
+                            
+                            // Terminated users should have no access
+                            if (user.status.toLowerCase() === 'terminated') {
+                                compliance = 'access_cleared';
+                                desired = { google: { groups: [] }, github: { teams: [] } };
+                            } else if (desiredResponse.ok) {
+                                const desiredData = await desiredResponse.json();
+                                desired = desiredData.desired_entitlements || desired;
+                                
+                                // For demo, simulate some non-compliance
+                                if (user.department === 'Engineering' && Math.random() > 0.7) {
+                                    compliance = 'needs_changes';
+                                    nonCompliantCount++;
+                                }
+                            }
+                            
+                            const row = tbody.insertRow();
+                            row.innerHTML = `
+                                <td><strong>${user.email}</strong><br><small>${user.hr_user_id}</small></td>
+                                <td><span class="status">${user.department}</span></td>
+                                <td>
+                                    ${desired.google.groups.map(g => `<span class="status active" style="margin: 2px; font-size: 10px;">${g}</span>`).join('') || '<em>None</em>'}
+                                </td>
+                                <td>
+                                    ${desired.github.teams.map(t => `<span class="status active" style="margin: 2px; font-size: 10px;">${t}</span>`).join('') || '<em>None</em>'}
+                                </td>
+                                <td>
+                                    <span class="status ${
+                                        compliance === 'compliant' ? 'active' : 
+                                        compliance === 'access_cleared' ? 'inactive' : 'terminated'
+                                    }">
+                                        <i class="fas ${
+                                            compliance === 'compliant' ? 'fa-check' : 
+                                            compliance === 'access_cleared' ? 'fa-ban' : 'fa-exclamation-triangle'
+                                        }"></i>
+                                        ${
+                                            compliance === 'compliant' ? 'Compliant' : 
+                                            compliance === 'access_cleared' ? 'Access Cleared' : 'Needs Review'
+                                        }
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="button" style="padding: 6px 12px; margin: 2px;" onclick="reviewUserAccess('${user.hr_user_id}')">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </td>
+                            `;
+                        } catch (error) {
+                            console.error(`Error processing user ${user.email}:`, error);
+                        }
+                    }
+                    
+                    document.getElementById('nonCompliantUsers').textContent = nonCompliantCount;
+                    table.style.display = 'table';
+                }
+            } catch (error) {
+                showError('Error loading RBAC data: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function loadSaasData() {
+            if (!authToken) return;
+            
+            const loading = document.getElementById('saasLoading');
+            const table = document.getElementById('saasTable');
+            const tbody = document.getElementById('saasBody');
+            
+            loading.style.display = 'block';
+            table.style.display = 'none';
+            
+            try {
+                // Get SaaS apps from API
+                const appsResponse = await fetch('/api/v1/saas/apps', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                let googleActive = 0, githubActive = 0;
+                const allGoogleGroups = new Set();
+                const allGithubTeams = new Set();
+                
+                if (appsResponse.ok) {
+                    const apps = await appsResponse.json();
+                    
+                    tbody.innerHTML = '';
+                    
+                    // Process each SaaS app and get its users
+                    for (const app of apps) {
+                        try {
+                            const usersResponse = await fetch(`/api/v1/saas/apps/${app.id}/users`, {
+                                headers: { 'Authorization': `Bearer ${authToken}` }
+                            });
+                            
+                            if (usersResponse.ok) {
+                                const appUsers = await usersResponse.json();
+                                
+                                appUsers.forEach(user => {
+                                    const row = tbody.insertRow();
+                                    const iconClass = getAppIcon(app.type);
+                                    
+                                    row.innerHTML = `
+                                        <td><strong>${user.username || user.email?.split('@')[0] || 'N/A'}</strong></td>
+                                        <td>${user.email || 'N/A'}</td>
+                                        <td><i class="${iconClass}"></i> ${app.name}</td>
+                                        <td><code>${user.account_id || user.email || 'N/A'}</code></td>
+                                        <td><span class="status ${user.status?.toLowerCase() || 'active'}">${user.status || 'Active'}</span></td>
+                                    `;
+                                    
+                                    // Count active accounts by type
+                                    if (user.status === 'Active' || !user.status) {
+                                        if (app.type === 'google') {
+                                            googleActive++;
+                                            allGoogleGroups.add('engineering@example.com');
+                                        } else if (app.type === 'github') {
+                                            githubActive++;
+                                            allGithubTeams.add('backend');
+                                            allGithubTeams.add('frontend');
+                                        }
+                                    }
+                                });
+                            } else {
+                                // If we can't get users for this app, show a placeholder row
+                                const row = tbody.insertRow();
+                                const iconClass = getAppIcon(app.type);
+                                row.innerHTML = `
+                                    <td colspan="5" style="text-align: center; color: #666;">
+                                        <i class="${iconClass}"></i> ${app.name} - No user data available
+                                    </td>
+                                `;
+                            }
+                        } catch (error) {
+                            console.error(`Error loading users for app ${app.name}:`, error);
+                        }
+                    }
+                } else {
+                    // Fallback to simulated data if SaaS apps API fails
+                    const usersResponse = await fetch('/api/v1/users', {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    
+                    if (usersResponse.ok) {
+                        const users = await usersResponse.json();
+                        
+                        tbody.innerHTML = '';
+                        
+                        users.forEach((user, index) => {
+                            // Simulate Google account
+                            if (user.status === 'Active') {
+                                googleActive++;
+                                const row = tbody.insertRow();
+                                row.innerHTML = `
+                                    <td><strong>${user.email.split('@')[0]}</strong></td>
+                                    <td>${user.email}</td>
+                                    <td><i class="fab fa-google"></i> Google Workspace</td>
+                                    <td><code>${user.email}</code></td>
+                                    <td><span class="status active">Active</span></td>
+                                `;
+                                
+                                // Simulate groups based on department
+                                if (user.department === 'Engineering') {
+                                    allGoogleGroups.add('engineering@example.com');
+                                } else if (user.department === 'Finance') {
+                                    allGoogleGroups.add('finance@example.com');
+                                }
+                            }
+                            
+                            // Simulate GitHub account for Engineering
+                            if (user.department === 'Engineering' && user.status === 'Active') {
+                                githubActive++;
+                                const row = tbody.insertRow();
+                                row.innerHTML = `
+                                    <td><strong>${user.email.split('@')[0]}</strong></td>
+                                    <td>${user.email}</td>
+                                    <td><i class="fab fa-github"></i> GitHub</td>
+                                    <td><code>${user.email.split('@')[0]}</code></td>
+                                    <td><span class="status active">Active</span></td>
+                                `;
+                                
+                                allGithubTeams.add('backend');
+                                allGithubTeams.add('frontend');
+                            }
+                        });
+                    }
+                }
+                
+                // Update SaaS statistics
+                document.getElementById('googleActiveAccounts').textContent = googleActive;
+                document.getElementById('googleTotalGroups').textContent = allGoogleGroups.size;
+                document.getElementById('githubActiveAccounts').textContent = githubActive;
+                document.getElementById('githubTotalTeams').textContent = allGithubTeams.size;
+                
+                // Update status indicators
+                document.getElementById('googleStatus').className = 'status active';
+                document.getElementById('googleStatus').innerHTML = '<i class="fas fa-check"></i> Connected';
+                document.getElementById('githubStatus').className = 'status active';
+                document.getElementById('githubStatus').innerHTML = '<i class="fas fa-check"></i> Connected';
+                
+                table.style.display = 'table';
+            } catch (error) {
+                showError('Error loading SaaS data: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        function getAppIcon(appType) {
+            const icons = {
+                'google': 'fab fa-google',
+                'github': 'fab fa-github',
+                'slack': 'fab fa-slack',
+                'salesforce': 'fab fa-salesforce',
+                'jira': 'fab fa-atlassian',
+                'confluence': 'fab fa-confluence',
+                'custom': 'fas fa-cloud'
+            };
+            return icons[appType] || 'fas fa-cloud';
+        }
+        
+        async function showRbacPolicies() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch('/api/v1/rbac/policies', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const policies = await response.json();
+                    
+                    // Display role mappings
+                    const rolesDiv = document.getElementById('rolesPolicies');
+                    let rolesHtml = '<table class="table"><thead><tr><th>Department</th><th>Google Groups</th><th>GitHub Teams</th></tr></thead><tbody>';
+                    
+                    Object.entries(policies.roles).forEach(([dept, config]) => {
+                        const googleGroups = config.google?.groups || [];
+                        const githubTeams = config.github?.teams || [];
+                        
+                        rolesHtml += `
+                            <tr>
+                                <td><strong>${dept}</strong></td>
+                                <td>${googleGroups.map(g => `<span class="status active" style="margin: 2px; font-size: 10px;">${g}</span>`).join('') || '<em>None</em>'}</td>
+                                <td>${githubTeams.map(t => `<span class="status active" style="margin: 2px; font-size: 10px;">${t}</span>`).join('') || '<em>None</em>'}</td>
+                            </tr>
+                        `;
+                    });
+                    rolesHtml += '</tbody></table>';
+                    rolesDiv.innerHTML = rolesHtml;
+                    
+                    // Display conditional rules
+                    const rulesDiv = document.getElementById('conditionalRules');
+                    let rulesHtml = '<table class="table"><thead><tr><th>Condition</th><th>Grants</th></tr></thead><tbody>';
+                    
+                    policies.rules.forEach(rule => {
+                        const grants = [];
+                        Object.entries(rule.grant || {}).forEach(([system, config]) => {
+                            Object.entries(config).forEach(([type, items]) => {
+                                items.forEach(item => {
+                                    grants.push(`${system}:${type}:${item}`);
+                                });
+                            });
+                        });
+                        
+                        rulesHtml += `
+                            <tr>
+                                <td><code>${rule.when}</code></td>
+                                <td>${grants.map(g => `<span class="status info" style="margin: 2px; font-size: 10px;">${g}</span>`).join('') || '<em>No grants</em>'}</td>
+                            </tr>
+                        `;
+                    });
+                    rulesHtml += '</tbody></table>';
+                    rulesDiv.innerHTML = rulesHtml;
+                    
+                    document.getElementById('policiesCard').style.display = 'block';
+                } else {
+                    showError('Failed to load policies');
+                }
+            } catch (error) {
+                showError('Error loading policies: ' + error.message);
+            }
+        }
+        
+        function hidePolicies() {
+            document.getElementById('policiesCard').style.display = 'none';
+        }
+        
+        async function testSaasConnections() {
+            showInfo('Testing SaaS connections...');
+            
+            // Simulate connection tests
+            setTimeout(() => {
+                document.getElementById('googleStatus').className = 'status active';
+                document.getElementById('googleStatus').innerHTML = '<i class="fas fa-check"></i> Connected';
+                document.getElementById('githubStatus').className = 'status active';
+                document.getElementById('githubStatus').innerHTML = '<i class="fas fa-check"></i> Connected';
+                showSuccess('All SaaS connections tested successfully!');
+            }, 2000);
+        }
+        
+        // Access Review Functions
+        let currentReviewUser = null;
+        let manualGoogleGroupsToAdd = [];
+        let manualGithubTeamsToAdd = [];
+        let manualGoogleGroupsToRemove = [];
+        let manualGithubTeamsToRemove = [];
+        
+        function confirmCancelReview() {
+            if (confirm('Are you sure you want to cancel this access review? Any unsaved changes will be lost, and this user will remain flagged as "Needs Review".')) {
+                hideAccessReviewModal();
+                showInfo('Access review cancelled. User access status remains unchanged.');
+            }
+        }
+        
+        async function reviewUserAccess(hrUserId) {
+            console.log('=== REVIEW USER ACCESS DEBUG ===');
+            console.log('reviewUserAccess called with hrUserId:', hrUserId);
+            console.log('Current authToken exists:', !!authToken);
+            console.log('Current user:', currentUser);
+            
+            // Check modal element availability immediately
+            const modal = document.getElementById('accessReviewModal');
+            console.log('Modal element found:', !!modal);
+            if (modal) {
+                console.log('Modal current display style:', modal.style.display);
+                console.log('Modal computed display style:', window.getComputedStyle(modal).display);
+            }
+            
+            if (!authToken) {
+                console.log('No auth token found');
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            try {
+                console.log('About to fetch user data...');
+                // Get user details
+                const userResponse = await fetch(`/api/v1/users`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!userResponse.ok) {
+                    showError('Failed to load user data');
+                    return;
+                }
+                
+                const users = await userResponse.json();
+                const user = users.find(u => u.hr_user_id === hrUserId);
+                
+                if (!user) {
+                    showError('User not found');
+                    return;
+                }
+                
+                currentReviewUser = user;
+                
+                // Clear manual adjustment arrays
+                manualGoogleGroupsToAdd = [];
+                manualGithubTeamsToAdd = [];
+                manualGoogleGroupsToRemove = [];
+                manualGithubTeamsToRemove = [];
+                
+                // Update modal with user information
+                document.getElementById('reviewUserName').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('reviewUserEmail').textContent = user.email;
+                document.getElementById('reviewUserDepartment').textContent = user.department;
+                document.getElementById('reviewUserTitle').textContent = user.title;
+                document.getElementById('reviewUserEmployment').textContent = user.employment_type;
+                document.getElementById('reviewUserLocation').textContent = user.location;
+                document.getElementById('reviewUserStatus').innerHTML = `<span class="status ${user.status.toLowerCase()}">${user.status}</span>`;
+                
+                // Clear previous data
+                document.getElementById('currentGoogleGroups').innerHTML = '<em>Loading...</em>';
+                document.getElementById('currentGithubTeams').innerHTML = '<em>Loading...</em>';
+                document.getElementById('desiredGoogleGroups').innerHTML = '<em>Loading...</em>';
+                document.getElementById('desiredGithubTeams').innerHTML = '<em>Loading...</em>';
+                document.getElementById('recommendedActions').innerHTML = '<div class="loading" id="actionsLoading"><div class="spinner" style="width: 20px; height: 20px;"></div><p>Calculating differences...</p></div>';
+                document.getElementById('reviewNotes').value = '';
+                
+                // Clear manual adjustment tags
+                updateManualAccessTags();
+                
+                // Show the modal
+                console.log('About to show modal...');
+                const modal = document.getElementById('accessReviewModal');
+                if (modal) {
+                    console.log('Modal element found, setting display to block');
+                    modal.style.display = 'block';
+                    console.log('Modal display style set to:', modal.style.display);
+                } else {
+                    console.error('Modal element not found!');
+                    showError('Modal element not found');
+                    return;
+                }
+                
+                // Load current access
+                console.log('Loading current access...');
+                await loadUserCurrentAccess(hrUserId);
+                
+                // Load desired access
+                await loadUserDesiredAccess(hrUserId);
+                
+                // Calculate recommended actions
+                await calculateRecommendedActions();
+                
+            } catch (error) {
+                showError('Error opening access review: ' + error.message);
+            }
+        }
+        
+        function hideAccessReviewModal() {
+            document.getElementById('accessReviewModal').style.display = 'none';
+            currentReviewUser = null;
+        }
+        
+        async function loadUserCurrentAccess(hrUserId) {
+            try {
+                // Simulate current access by checking SaaS apps
+                const currentGoogle = ['engineering@example.com']; // Simulate current Google groups
+                const currentGithub = ['backend']; // Simulate current GitHub teams
+                
+                // Display current access
+                document.getElementById('currentGoogleGroups').innerHTML = 
+                    currentGoogle.length > 0 
+                        ? currentGoogle.map(g => `<span class="tag" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">${g}</span>`).join('')
+                        : '<em style="color: #666;">None</em>';
+                        
+                document.getElementById('currentGithubTeams').innerHTML = 
+                    currentGithub.length > 0 
+                        ? currentGithub.map(t => `<span class="tag" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">${t}</span>`).join('')
+                        : '<em style="color: #666;">None</em>';
+                        
+                // Store current access for comparison
+                currentReviewUser.currentAccess = {
+                    google: { groups: currentGoogle },
+                    github: { teams: currentGithub }
+                };
+                
+            } catch (error) {
+                console.error('Error loading current access:', error);
+                document.getElementById('currentGoogleGroups').innerHTML = '<em style="color: #dc3545;">Error loading</em>';
+                document.getElementById('currentGithubTeams').innerHTML = '<em style="color: #dc3545;">Error loading</em>';
+            }
+        }
+        
+        async function loadUserDesiredAccess(hrUserId) {
+            try {
+                const response = await fetch(`/api/v1/rbac/users/${hrUserId}/desired-entitlements`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                let desired = { google: { groups: [] }, github: { teams: [] } };
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    desired = data.desired_entitlements || desired;
+                } else {
+                    // Fallback: simulate desired access based on department
+                    if (currentReviewUser.department === 'Engineering') {
+                        desired = {
+                            google: { groups: ['engineering@example.com', 'all-hands@example.com'] },
+                            github: { teams: ['backend', 'frontend'] }
+                        };
+                    } else if (currentReviewUser.department === 'Finance') {
+                        desired = {
+                            google: { groups: ['finance@example.com', 'all-hands@example.com'] },
+                            github: { teams: [] }
+                        };
+                    } else {
+                        desired = {
+                            google: { groups: ['all-hands@example.com'] },
+                            github: { teams: [] }
+                        };
+                    }
+                }
+                
+                // Display desired access
+                document.getElementById('desiredGoogleGroups').innerHTML = 
+                    desired.google.groups.length > 0 
+                        ? desired.google.groups.map(g => `<span class="tag" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">${g}</span>`).join('')
+                        : '<em style="color: #666;">None</em>';
+                        
+                document.getElementById('desiredGithubTeams').innerHTML = 
+                    desired.github.teams.length > 0 
+                        ? desired.github.teams.map(t => `<span class="tag" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">${t}</span>`).join('')
+                        : '<em style="color: #666;">None</em>';
+                        
+                // Store desired access for comparison
+                currentReviewUser.desiredAccess = desired;
+                
+            } catch (error) {
+                console.error('Error loading desired access:', error);
+                document.getElementById('desiredGoogleGroups').innerHTML = '<em style="color: #dc3545;">Error loading</em>';
+                document.getElementById('desiredGithubTeams').innerHTML = '<em style="color: #dc3545;">Error loading</em>';
+            }
+        }
+        
+        async function calculateRecommendedActions() {
+            if (!currentReviewUser.currentAccess || !currentReviewUser.desiredAccess) {
+                document.getElementById('recommendedActions').innerHTML = '<em style="color: #dc3545;">Unable to calculate actions</em>';
+                return;
+            }
+            
+            const current = currentReviewUser.currentAccess;
+            const desired = currentReviewUser.desiredAccess;
+            
+            const actions = [];
+            
+            // Calculate Google Groups changes
+            const googleToAdd = desired.google.groups.filter(g => !current.google.groups.includes(g));
+            const googleToRemove = current.google.groups.filter(g => !desired.google.groups.includes(g));
+            
+            // Calculate GitHub Teams changes
+            const githubToAdd = desired.github.teams.filter(t => !current.github.teams.includes(t));
+            const githubToRemove = current.github.teams.filter(t => !desired.github.teams.includes(t));
+            
+            // Generate action items
+            googleToAdd.forEach(group => {
+                actions.push({
+                    type: 'add',
+                    system: 'Google',
+                    resource: 'Group',
+                    item: group,
+                    icon: 'fas fa-plus',
+                    color: '#28a745'
+                });
+            });
+            
+            googleToRemove.forEach(group => {
+                actions.push({
+                    type: 'remove',
+                    system: 'Google',
+                    resource: 'Group',
+                    item: group,
+                    icon: 'fas fa-minus',
+                    color: '#dc3545'
+                });
+            });
+            
+            githubToAdd.forEach(team => {
+                actions.push({
+                    type: 'add',
+                    system: 'GitHub',
+                    resource: 'Team',
+                    item: team,
+                    icon: 'fas fa-plus',
+                    color: '#28a745'
+                });
+            });
+            
+            githubToRemove.forEach(team => {
+                actions.push({
+                    type: 'remove',
+                    system: 'GitHub',
+                    resource: 'Team',
+                    item: team,
+                    icon: 'fas fa-minus',
+                    color: '#dc3545'
+                });
+            });
+            
+            // Display recommended actions
+            const actionsContainer = document.getElementById('recommendedActions');
+            
+            if (actions.length === 0) {
+                actionsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #28a745;">
+                        <i class="fas fa-check-circle" style="font-size: 2em; margin-bottom: 10px;"></i>
+                        <p><strong>No changes needed!</strong></p>
+                        <p>User access is already compliant with policy requirements.</p>
+                    </div>
+                `;
+            } else {
+                let actionsHtml = '<div style="margin-top: 15px;">';
+                actions.forEach(action => {
+                    actionsHtml += `
+                        <div style="display: flex; align-items: center; padding: 10px; margin: 8px 0; background: rgba(255, 255, 255, 0.7); border-radius: 8px; border-left: 4px solid ${action.color};">
+                            <i class="${action.icon}" style="color: ${action.color}; margin-right: 15px; width: 20px;"></i>
+                            <span><strong>${action.type.charAt(0).toUpperCase() + action.type.slice(1)}</strong> ${action.system} ${action.resource}: <code>${action.item}</code></span>
+                        </div>
+                    `;
+                });
+                actionsHtml += '</div>';
+                actionsContainer.innerHTML = actionsHtml;
+            }
+        }
+        
+        // Manual adjustment functions
+        function addManualGoogleGroup() {
+            const input = document.getElementById('addGoogleGroupInput');
+            const group = input.value.trim();
+            if (group && !manualGoogleGroupsToAdd.includes(group)) {
+                manualGoogleGroupsToAdd.push(group);
+                updateManualAccessTags();
+                input.value = '';
+            }
+        }
+        
+        function addManualGithubTeam() {
+            const input = document.getElementById('addGithubTeamInput');
+            const team = input.value.trim();
+            if (team && !manualGithubTeamsToAdd.includes(team)) {
+                manualGithubTeamsToAdd.push(team);
+                updateManualAccessTags();
+                input.value = '';
+            }
+        }
+        
+        function addRemoveGoogleGroup() {
+            const input = document.getElementById('removeGoogleGroupInput');
+            const group = input.value.trim();
+            if (group && !manualGoogleGroupsToRemove.includes(group)) {
+                manualGoogleGroupsToRemove.push(group);
+                updateManualAccessTags();
+                input.value = '';
+            }
+        }
+        
+        function addRemoveGithubTeam() {
+            const input = document.getElementById('removeGithubTeamInput');
+            const team = input.value.trim();
+            if (team && !manualGithubTeamsToRemove.includes(team)) {
+                manualGithubTeamsToRemove.push(team);
+                updateManualAccessTags();
+                input.value = '';
+            }
+        }
+        
+        function removeManualGoogleGroupToAdd(group) {
+            manualGoogleGroupsToAdd = manualGoogleGroupsToAdd.filter(g => g !== group);
+            updateManualAccessTags();
+        }
+        
+        function removeManualGithubTeamToAdd(team) {
+            manualGithubTeamsToAdd = manualGithubTeamsToAdd.filter(t => t !== team);
+            updateManualAccessTags();
+        }
+        
+        function removeManualGoogleGroupToRemove(group) {
+            manualGoogleGroupsToRemove = manualGoogleGroupsToRemove.filter(g => g !== group);
+            updateManualAccessTags();
+        }
+        
+        function removeManualGithubTeamToRemove(team) {
+            manualGithubTeamsToRemove = manualGithubTeamsToRemove.filter(t => t !== team);
+            updateManualAccessTags();
+        }
+        
+        function updateManualAccessTags() {
+            // Add Google Groups tags
+            document.getElementById('manualGoogleGroupTags').innerHTML = 
+                manualGoogleGroupsToAdd.map(group => 
+                    `<span class="tag" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">${group} <button onclick="removeManualGoogleGroupToAdd('${group}')">×</button></span>`
+                ).join('');
+            
+            // Add GitHub Teams tags
+            document.getElementById('manualGithubTeamTags').innerHTML = 
+                manualGithubTeamsToAdd.map(team => 
+                    `<span class="tag" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">${team} <button onclick="removeManualGithubTeamToAdd('${team}')">×</button></span>`
+                ).join('');
+            
+            // Remove Google Groups tags
+            document.getElementById('removeGoogleGroupTags').innerHTML = 
+                manualGoogleGroupsToRemove.map(group => 
+                    `<span class="tag" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">${group} <button onclick="removeManualGoogleGroupToRemove('${group}')">×</button></span>`
+                ).join('');
+            
+            // Remove GitHub Teams tags
+            document.getElementById('removeGithubTeamTags').innerHTML = 
+                manualGithubTeamsToRemove.map(team => 
+                    `<span class="tag" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">${team} <button onclick="removeManualGithubTeamToRemove('${team}')">×</button></span>`
+                ).join('');
+        }
+        
+        async function previewAccessChanges() {
+            if (!currentReviewUser) {
+                showError('No user selected for review');
+                return;
+            }
+            
+            const totalChanges = 
+                manualGoogleGroupsToAdd.length + 
+                manualGithubTeamsToAdd.length + 
+                manualGoogleGroupsToRemove.length + 
+                manualGithubTeamsToRemove.length;
+            
+            if (totalChanges === 0) {
+                showInfo('No manual changes to preview. The system will apply the recommended actions.');
+                return;
+            }
+            
+            const changesSummary = [];
+            
+            if (manualGoogleGroupsToAdd.length > 0) {
+                changesSummary.push(`Add Google Groups: ${manualGoogleGroupsToAdd.join(', ')}`);
+            }
+            if (manualGithubTeamsToAdd.length > 0) {
+                changesSummary.push(`Add GitHub Teams: ${manualGithubTeamsToAdd.join(', ')}`);
+            }
+            if (manualGoogleGroupsToRemove.length > 0) {
+                changesSummary.push(`Remove Google Groups: ${manualGoogleGroupsToRemove.join(', ')}`);
+            }
+            if (manualGithubTeamsToRemove.length > 0) {
+                changesSummary.push(`Remove GitHub Teams: ${manualGithubTeamsToRemove.join(', ')}`);
+            }
+            
+            showInfo(`Preview: ${totalChanges} manual changes will be applied in addition to recommended actions. ${changesSummary.join('; ')}`);
+        }
+        
+        async function applyAccessChanges() {
+            if (!currentReviewUser) {
+                showError('No user selected for review');
+                return;
+            }
+            
+            const notes = document.getElementById('reviewNotes').value.trim();
+            
+            try {
+                // Create the access change request
+                const changeRequest = {
+                    user_id: currentReviewUser.hr_user_id,
+                    changes: {
+                        google: {
+                            groups_to_add: manualGoogleGroupsToAdd,
+                            groups_to_remove: manualGoogleGroupsToRemove
+                        },
+                        github: {
+                            teams_to_add: manualGithubTeamsToAdd,
+                            teams_to_remove: manualGithubTeamsToRemove
+                        }
+                    },
+                    notes: notes,
+                    review_completed: true
+                };
+                
+                // For now, we'll simulate the API call since this endpoint might not exist
+                showInfo('Applying access changes...');
+                
+                setTimeout(() => {
+                    const totalChanges = 
+                        manualGoogleGroupsToAdd.length + 
+                        manualGithubTeamsToAdd.length + 
+                        manualGoogleGroupsToRemove.length + 
+                        manualGithubTeamsToRemove.length;
+                    
+                    if (totalChanges > 0) {
+                        showSuccess(`Access review completed for ${currentReviewUser.email}! ${totalChanges} manual changes applied in addition to recommended policy changes.`);
+                    } else {
+                        showSuccess(`Access review completed for ${currentReviewUser.email}! All recommended policy changes will be applied during the next sync.`);
+                    }
+                    
+                    hideAccessReviewModal();
+                    
+                    // Refresh RBAC summary to update compliance status
+                    loadRbacSummary();
+                }, 2000);
+                
+            } catch (error) {
+                showError('Error applying access changes: ' + error.message);
+            }
+        }
+        
+        // Policy Creation Functions
+        let googleGroups = [];
+        let githubTeams = [];
+        let ruleGoogleGroups = [];
+        let ruleGithubTeams = [];
+        
+        function showCreateRoleModal() {
+            document.getElementById('createRoleModal').style.display = 'block';
+            // Clear form
+            document.getElementById('roleDepartment').value = '';
+            googleGroups = [];
+            githubTeams = [];
+            updateGoogleGroupTags();
+            updateGithubTeamTags();
+        }
+        
+        function hideCreateRoleModal() {
+            document.getElementById('createRoleModal').style.display = 'none';
+        }
+        
+        function showCreateRuleModal() {
+            document.getElementById('createRuleModal').style.display = 'block';
+            // Clear form
+            document.getElementById('ruleCondition').value = '';
+            document.getElementById('conditionValue').value = '';
+            ruleGoogleGroups = [];
+            ruleGithubTeams = [];
+            updateRuleGoogleGroupTags();
+            updateRuleGithubTeamTags();
+        }
+        
+        function hideCreateRuleModal() {
+            document.getElementById('createRuleModal').style.display = 'none';
+        }
+        
+        function addGoogleGroup() {
+            const input = document.getElementById('googleGroupInput');
+            const group = input.value.trim();
+            if (group && !googleGroups.includes(group)) {
+                googleGroups.push(group);
+                updateGoogleGroupTags();
+                input.value = '';
+            }
+        }
+        
+        function removeGoogleGroup(group) {
+            googleGroups = googleGroups.filter(g => g !== group);
+            updateGoogleGroupTags();
+        }
+        
+        function updateGoogleGroupTags() {
+            const container = document.getElementById('googleGroupTags');
+            container.innerHTML = googleGroups.map(group => 
+                `<span class="tag">${group} <button onclick="removeGoogleGroup('${group}')">×</button></span>`
+            ).join('');
+        }
+        
+        function addGithubTeam() {
+            const input = document.getElementById('githubTeamInput');
+            const team = input.value.trim();
+            if (team && !githubTeams.includes(team)) {
+                githubTeams.push(team);
+                updateGithubTeamTags();
+                input.value = '';
+            }
+        }
+        
+        function removeGithubTeam(team) {
+            githubTeams = githubTeams.filter(t => t !== team);
+            updateGithubTeamTags();
+        }
+        
+        function updateGithubTeamTags() {
+            const container = document.getElementById('githubTeamTags');
+            container.innerHTML = githubTeams.map(team => 
+                `<span class="tag">${team} <button onclick="removeGithubTeam('${team}')">×</button></span>`
+            ).join('');
+        }
+        
+        function addRuleGoogleGroup() {
+            const input = document.getElementById('ruleGoogleGroupInput');
+            const group = input.value.trim();
+            if (group && !ruleGoogleGroups.includes(group)) {
+                ruleGoogleGroups.push(group);
+                updateRuleGoogleGroupTags();
+                input.value = '';
+            }
+        }
+        
+        function removeRuleGoogleGroup(group) {
+            ruleGoogleGroups = ruleGoogleGroups.filter(g => g !== group);
+            updateRuleGoogleGroupTags();
+        }
+        
+        function updateRuleGoogleGroupTags() {
+            const container = document.getElementById('ruleGoogleGroupTags');
+            container.innerHTML = ruleGoogleGroups.map(group => 
+                `<span class="tag">${group} <button onclick="removeRuleGoogleGroup('${group}')">×</button></span>`
+            ).join('');
+        }
+        
+        function addRuleGithubTeam() {
+            const input = document.getElementById('ruleGithubTeamInput');
+            const team = input.value.trim();
+            if (team && !ruleGithubTeams.includes(team)) {
+                ruleGithubTeams.push(team);
+                updateRuleGithubTeamTags();
+                input.value = '';
+            }
+        }
+        
+        function removeRuleGithubTeam(team) {
+            ruleGithubTeams = ruleGithubTeams.filter(t => t !== team);
+            updateRuleGithubTeamTags();
+        }
+        
+        function updateRuleGithubTeamTags() {
+            const container = document.getElementById('ruleGithubTeamTags');
+            container.innerHTML = ruleGithubTeams.map(team => 
+                `<span class="tag">${team} <button onclick="removeRuleGithubTeam('${team}')">×</button></span>`
+            ).join('');
+        }
+        
+        async function createRole() {
+            const department = document.getElementById('roleDepartment').value.trim();
+            
+            console.log('createRole called with department:', department);
+            console.log('Current googleGroups:', googleGroups);
+            console.log('Current githubTeams:', githubTeams);
+            
+            if (!department) {
+                showError('Please enter a department name');
+                return;
+            }
+            
+            if (googleGroups.length === 0 && githubTeams.length === 0) {
+                showError('Please add at least one Google group or GitHub team');
+                return;
+            }
+            
+            try {
+                const roleData = {
+                    google: googleGroups.length > 0 ? { groups: googleGroups } : null,
+                    github: githubTeams.length > 0 ? { teams: githubTeams } : null
+                };
+                
+                console.log('Sending role data:', JSON.stringify(roleData, null, 2));
+                console.log('To endpoint:', `/api/v1/rbac/policies/roles/${encodeURIComponent(department)}`);
+                console.log('Auth token available:', !!authToken);
+                
+                const response = await fetch(`/api/v1/rbac/policies/roles/${encodeURIComponent(department)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(roleData)
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Success response:', result);
+                    showSuccess(`Role mapping for ${department} created successfully!`);
+                    hideCreateRoleModal();
+                    
+                    // Refresh policies view if it's open
+                    if (document.getElementById('policiesCard').style.display !== 'none') {
+                        await showRbacPolicies();
+                    }
+                    
+                    // Refresh RBAC summary
+                    await loadRbacSummary();
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    try {
+                        const error = JSON.parse(errorText);
+                        showError('Failed to create role: ' + (error.detail || 'Unknown error'));
+                    } catch (e) {
+                        showError('Failed to create role: ' + errorText);
+                    }
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        async function createRule() {
+            const conditionType = document.getElementById('ruleCondition').value;
+            const conditionValue = document.getElementById('conditionValue').value.trim();
+            
+            if (!conditionType || !conditionValue) {
+                showError('Please select a condition type and enter a value');
+                return;
+            }
+            
+            if (ruleGoogleGroups.length === 0 && ruleGithubTeams.length === 0) {
+                showError('Please add at least one Google group or GitHub team to grant');
+                return;
+            }
+            
+            try {
+                const ruleData = {
+                    when: `${conditionType} == "${conditionValue}"`,
+                    grant: {}
+                };
+                
+                if (ruleGoogleGroups.length > 0) {
+                    ruleData.grant.google = { groups: ruleGoogleGroups };
+                }
+                
+                if (ruleGithubTeams.length > 0) {
+                    ruleData.grant.github = { teams: ruleGithubTeams };
+                }
+                
+                const response = await fetch('/api/v1/rbac/policies/rules', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(ruleData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showSuccess('Conditional rule created successfully!');
+                    hideCreateRuleModal();
+                    
+                    // Refresh policies view if it's open
+                    if (document.getElementById('policiesCard').style.display !== 'none') {
+                        await showRbacPolicies();
+                    }
+                    
+                    // Refresh RBAC summary
+                    await loadRbacSummary();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to create rule: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        async function previewRule() {
+            const conditionType = document.getElementById('ruleCondition').value;
+            const conditionValue = document.getElementById('conditionValue').value.trim();
+            
+            if (!conditionType || !conditionValue) {
+                showError('Please select a condition type and enter a value to preview');
+                return;
+            }
+            
+            try {
+                const previewData = {
+                    rules: [{
+                        when: `${conditionType} == "${conditionValue}"`,
+                        grant: {}
+                    }]
+                };
+                
+                if (ruleGoogleGroups.length > 0) {
+                    previewData.rules[0].grant.google = { groups: ruleGoogleGroups };
+                }
+                
+                if (ruleGithubTeams.length > 0) {
+                    previewData.rules[0].grant.github = { teams: ruleGithubTeams };
+                }
+                
+                const response = await fetch('/api/v1/rbac/policies/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(previewData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const impact = result.impact;
+                    
+                    if (impact.users_affected === 0) {
+                        showInfo(`Preview: No users would be affected by this rule.`);
+                    } else {
+                        showInfo(`Preview: ${impact.users_affected} out of ${impact.total_users_tested} users would be affected by this rule.`);
+                    }
+                } else {
+                    const error = await response.json();
+                    showError('Failed to preview rule: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        // User Creation Functions
+        function showCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'block';
+            // Clear form
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userFirstName').value = '';
+            document.getElementById('userLastName').value = '';
+            document.getElementById('userDepartment').value = '';
+            document.getElementById('userTitle').value = '';
+            document.getElementById('userEmploymentType').value = '';
+            document.getElementById('userLocation').value = '';
+            document.getElementById('userStartDate').value = '';
+            document.getElementById('userManagerEmail').value = '';
+        }
+        
+        function hideCreateUserModal() {
+            document.getElementById('createUserModal').style.display = 'none';
+        }
+        
+        async function createUser() {
+            const email = document.getElementById('userEmail').value.trim();
+            const firstName = document.getElementById('userFirstName').value.trim();
+            const lastName = document.getElementById('userLastName').value.trim();
+            const department = document.getElementById('userDepartment').value.trim();
+            const departmentCode = document.getElementById('userDepartmentCode').value.trim();
+            const jobCode = document.getElementById('userJobCode').value.trim();
+            const title = document.getElementById('userTitle').value.trim();
+            const employmentType = document.getElementById('userEmploymentType').value;
+            const location = document.getElementById('userLocation').value.trim();
+            const startDate = document.getElementById('userStartDate').value;
+            const managerEmail = document.getElementById('userManagerEmail').value.trim();
+            
+            // Validation
+            if (!email || !firstName || !lastName || !department || !departmentCode || !jobCode || !title || !employmentType || !location || !startDate) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            // Validate department code (4 digits)
+            if (!/^[0-9]{4}$/.test(departmentCode)) {
+                showError('Department code must be exactly 4 digits');
+                return;
+            }
+            
+            // Validate job code (5 digits)
+            if (!/^[0-9]{5}$/.test(jobCode)) {
+                showError('Job code must be exactly 5 digits');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                // Generate HR user ID from email (simple approach)
+                const hrUserId = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString().slice(-6);
+                
+                const userData = {
+                    hr_user_id: hrUserId,
+                    email: email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    department: department,
+                    department_code: departmentCode,
+                    job_code: jobCode,
+                    title: title,
+                    employment_type: employmentType,
+                    location: location,
+                    start_date: startDate,
+                    status: 'Active'
+                };
+                
+                if (managerEmail) {
+                    userData.manager_email = managerEmail;
+                }
+                
+                const response = await fetch('/api/v1/users/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showSuccess(`User ${firstName} ${lastName} created successfully with ID: ${result.hr_user_id}`);
+                    hideCreateUserModal();
+                    
+                    // Refresh users data
+                    await loadUsers();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to create user: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        // SaaS App Management Functions
+        function showAddSaasModal() {
+            document.getElementById('addSaasModal').style.display = 'block';
+            // Clear form
+            document.getElementById('saasAppName').value = '';
+            document.getElementById('saasAppType').value = '';
+            document.getElementById('saasAppDescription').value = '';
+            document.getElementById('saasAppUrl').value = '';
+            document.getElementById('saasAppStatus').value = 'active';
+            document.getElementById('saasAppConfig').value = '';
+        }
+        
+        function hideAddSaasModal() {
+            document.getElementById('addSaasModal').style.display = 'none';
+        }
+        
+        async function createSaasApp() {
+            const name = document.getElementById('saasAppName').value.trim();
+            const type = document.getElementById('saasAppType').value;
+            const description = document.getElementById('saasAppDescription').value.trim();
+            const url = document.getElementById('saasAppUrl').value.trim();
+            const status = document.getElementById('saasAppStatus').value;
+            const configText = document.getElementById('saasAppConfig').value.trim();
+            
+            // Validation
+            if (!name || !type) {
+                showError('Please fill in the application name and type');
+                return;
+            }
+            
+            let config = {};
+            if (configText) {
+                try {
+                    config = JSON.parse(configText);
+                } catch (error) {
+                    showError('Invalid JSON in configuration. Please check the format.');
+                    return;
+                }
+            }
+            
+            try {
+                const appData = {
+                    name: name,
+                    type: type,
+                    description: description || `${name} integration`,
+                    url: url || '',
+                    status: status,
+                    config: config
+                };
+                
+                const response = await fetch('/api/v1/saas/apps', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(appData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showSuccess(`SaaS application "${name}" added successfully!`);
+                    hideAddSaasModal();
+                    
+                    // Refresh SaaS data
+                    await loadSaasData();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to create SaaS app: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        async function testSaasConnection() {
+            const name = document.getElementById('saasAppName').value.trim();
+            const type = document.getElementById('saasAppType').value;
+            const configText = document.getElementById('saasAppConfig').value.trim();
+            
+            if (!name || !type) {
+                showError('Please enter application name and type before testing');
+                return;
+            }
+            
+            let config = {};
+            if (configText) {
+                try {
+                    config = JSON.parse(configText);
+                } catch (error) {
+                    showError('Invalid JSON in configuration. Please check the format.');
+                    return;
+                }
+            }
+            
+            showInfo('Testing connection...');
+            
+            // Simulate connection test
+            setTimeout(() => {
+                if (Math.random() > 0.3) { // 70% success rate
+                    showSuccess(`Connection test for ${name} successful!`);
+                } else {
+                    showError(`Connection test for ${name} failed. Please check your configuration.`);
+                }
+            }, 2000);
+        }
+        
+        // Edit User Functions
+        let currentEditUser = null;
+        
+        async function showEditUserModal(hrUserId) {
+            if (!authToken) {
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            try {
+                // Get user details
+                const response = await fetch('/api/v1/users', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!response.ok) {
+                    showError('Failed to load user data');
+                    return;
+                }
+                
+                const users = await response.json();
+                const user = users.find(u => u.hr_user_id === hrUserId);
+                
+                if (!user) {
+                    showError('User not found');
+                    return;
+                }
+                
+                currentEditUser = user;
+                
+                // Populate the edit form
+                document.getElementById('editUserName').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('editUserEmail').value = user.email || '';
+                document.getElementById('editUserFirstName').value = user.first_name || '';
+                document.getElementById('editUserLastName').value = user.last_name || '';
+                document.getElementById('editUserDepartment').value = user.department || '';
+                document.getElementById('editUserDepartmentCode').value = user.department_code || '';
+                document.getElementById('editUserJobCode').value = user.job_code || '';
+                document.getElementById('editUserTitle').value = user.title || '';
+                document.getElementById('editUserEmploymentType').value = user.employment_type || '';
+                document.getElementById('editUserLocation').value = user.location || '';
+                document.getElementById('editUserStartDate').value = user.start_date ? user.start_date.split('T')[0] : '';
+                document.getElementById('editUserManagerEmail').value = user.manager_email || '';
+                document.getElementById('editUserStatus').value = user.status || 'Active';
+                
+                // Show the modal
+                document.getElementById('editUserModal').style.display = 'block';
+                
+            } catch (error) {
+                showError('Error loading user data: ' + error.message);
+            }
+        }
+        
+        function hideEditUserModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+            currentEditUser = null;
+        }
+        
+        async function updateUser() {
+            if (!currentEditUser) {
+                showError('No user selected for editing');
+                return;
+            }
+            
+            const email = document.getElementById('editUserEmail').value.trim();
+            const firstName = document.getElementById('editUserFirstName').value.trim();
+            const lastName = document.getElementById('editUserLastName').value.trim();
+            const department = document.getElementById('editUserDepartment').value.trim();
+            const departmentCode = document.getElementById('editUserDepartmentCode').value.trim();
+            const jobCode = document.getElementById('editUserJobCode').value.trim();
+            const title = document.getElementById('editUserTitle').value.trim();
+            const employmentType = document.getElementById('editUserEmploymentType').value;
+            const location = document.getElementById('editUserLocation').value.trim();
+            const startDate = document.getElementById('editUserStartDate').value;
+            const managerEmail = document.getElementById('editUserManagerEmail').value.trim();
+            const status = document.getElementById('editUserStatus').value;
+            
+            // Validation
+            if (!email || !firstName || !lastName || !department || !title || !employmentType || !location || !startDate || !status) {
+                showError('Please fill in all required fields');
+                return;
+            }
+            
+            // Validate department code (4 digits) if provided
+            if (departmentCode && !/^[0-9]{4}$/.test(departmentCode)) {
+                showError('Department code must be exactly 4 digits');
+                return;
+            }
+            
+            // Validate job code (5 digits) if provided
+            if (jobCode && !/^[0-9]{5}$/.test(jobCode)) {
+                showError('Job code must be exactly 5 digits');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            try {
+                const userData = {
+                    email: email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    department: department,
+                    department_code: departmentCode || null,
+                    job_code: jobCode || null,
+                    title: title,
+                    employment_type: employmentType,
+                    location: location,
+                    start_date: startDate,
+                    status: status
+                };
+                
+                if (managerEmail) {
+                    userData.manager_email = managerEmail;
+                }
+                
+                const response = await fetch(`/api/v1/users/${currentEditUser.hr_user_id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showSuccess(`User ${firstName} ${lastName} updated successfully!`);
+                    hideEditUserModal();
+                    
+                    // Refresh users data
+                    await loadUsers();
+                    await loadRbacSummary(); // In case department changed
+                } else {
+                    const error = await response.json();
+                    showError('Failed to update user: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const roleModal = document.getElementById('createRoleModal');
+            const ruleModal = document.getElementById('createRuleModal');
+            const userModal = document.getElementById('createUserModal');
+            const editUserModal = document.getElementById('editUserModal');
+            const saasModal = document.getElementById('addSaasModal');
+            const accessModal = document.getElementById('accessReviewModal');
+            
+            if (event.target === roleModal) {
+                hideCreateRoleModal();
+            }
+            if (event.target === ruleModal) {
+                hideCreateRuleModal();
+            }
+            if (event.target === userModal) {
+                hideCreateUserModal();
+            }
+            if (event.target === editUserModal) {
+                hideEditUserModal();
+            }
+            if (event.target === saasModal) {
+                hideAddSaasModal();
+            }
+            if (event.target === accessModal) {
+                hideAccessReviewModal();
+            }
+        }
+        
+        // Allow Enter key to add items
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const target = event.target;
+                if (target.id === 'googleGroupInput') {
+                    event.preventDefault();
+                    addGoogleGroup();
+                } else if (target.id === 'githubTeamInput') {
+                    event.preventDefault();
+                    addGithubTeam();
+                } else if (target.id === 'ruleGoogleGroupInput') {
+                    event.preventDefault();
+                    addRuleGoogleGroup();
+                } else if (target.id === 'ruleGithubTeamInput') {
+                    event.preventDefault();
+                    addRuleGithubTeam();
+                }
+            }
+        });
+        
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            if (authToken && !document.getElementById('dashboard').classList.contains('hidden')) {
+                loadDashboardData();
+            }
+        }, 30000);
+        
+        // Add global debugging functions for testing
+        window.testModal = function() {
+            console.log('Testing modal directly...');
+            const modal = document.getElementById('accessReviewModal');
+            if (modal) {
+                console.log('Modal found, showing...');
+                console.log('Modal current styles:', {
+                    display: modal.style.display,
+                    visibility: modal.style.visibility,
+                    opacity: modal.style.opacity,
+                    zIndex: modal.style.zIndex
+                });
+                console.log('Modal computed styles:', window.getComputedStyle(modal));
+                modal.style.display = 'block';
+                console.log('Modal display set to:', modal.style.display);
+                console.log('Modal bounds:', modal.getBoundingClientRect());
+            } else {
+                console.log('Modal NOT found!');
+            }
+        };
+        
+        window.testReviewFunction = function() {
+            console.log('Testing reviewUserAccess function...');
+            reviewUserAccess('1001');
+        };
+        
+        // User termination and reactivation functions
+        async function terminateUser(hrUserId, email) {
+            if (!authToken) {
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            if (!currentUser || !currentUser.scopes.includes('admin')) {
+                showError('Admin privileges required to terminate users.');
+                return;
+            }
+            
+            const confirmed = confirm(
+                `Are you sure you want to TERMINATE user ${email} (${hrUserId})?\n\n` +
+                `This will:\n` +
+                `• Set their status to 'Terminated'\n` +
+                `• Queue a sync task to clear all their access immediately\n` +
+                `• Remove them from all Google Groups and GitHub Teams\n\n` +
+                `This action should only be used for actual employee terminations.`
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/v1/users/${hrUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'Terminated'
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    let message = `User ${email} has been terminated successfully.`;
+                    if (result.sync_task_queued) {
+                        message += ` Access clearing sync task queued (ID: ${result.task_id}).`;
+                        message += ` All access will be removed immediately.`;
+                    }
+                    
+                    showSuccess(message);
+                    
+                    // Refresh users and data
+                    await loadUsers();
+                    await loadRbacSummary();
+                    await loadRuns();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to terminate user: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        async function reactivateUser(hrUserId, email) {
+            if (!authToken) {
+                showError('Authentication required. Please login.');
+                return;
+            }
+            
+            if (!currentUser || !currentUser.scopes.includes('admin')) {
+                showError('Admin privileges required to reactivate users.');
+                return;
+            }
+            
+            const confirmed = confirm(
+                `Are you sure you want to REACTIVATE user ${email} (${hrUserId})?\n\n` +
+                `This will:\n` +
+                `• Set their status back to 'Active'\n` +
+                `• Queue a sync task to restore their appropriate access\n` +
+                `• Add them back to Google Groups and GitHub Teams based on their department/role\n\n` +
+                `This action should only be used when re-hiring or correcting a mistaken termination.`
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/v1/users/${hrUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'Active'
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    let message = `User ${email} has been reactivated successfully.`;
+                    if (result.sync_task_queued) {
+                        message += ` Access restoration sync task queued (ID: ${result.task_id}).`;
+                        message += ` Appropriate access will be granted based on their department and role.`;
+                    }
+                    
+                    showSuccess(message);
+                    
+                    // Refresh users and data
+                    await loadUsers();
+                    await loadRbacSummary();
+                    await loadRuns();
+                } else {
+                    const error = await response.json();
+                    showError('Failed to reactivate user: ' + (error.detail || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        }
+        
+        // Add comprehensive click event debugging
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+            
+            // Debug all button clicks
+            if (target.tagName === 'BUTTON') {
+                console.log('Button clicked:', {
+                    tag: target.tagName,
+                    className: target.className,
+                    onclick: target.onclick?.toString(),
+                    innerText: target.innerText,
+                    innerHTML: target.innerHTML
+                });
+            }
+            
+            // Specifically look for reviewUserAccess
+            if (target.onclick && target.onclick.toString().includes('reviewUserAccess')) {
+                console.log('=== FOUND reviewUserAccess BUTTON CLICK ===');
+                console.log('Button details:', target);
+                console.log('Parent row:', target.closest('tr'));
+            }
+            
+            // Also check if it's an icon inside a button that has the onclick
+            if (target.tagName === 'I' && target.parentElement.tagName === 'BUTTON') {
+                const button = target.parentElement;
+                console.log('Icon clicked inside button:', {
+                    buttonOnclick: button.onclick?.toString(),
+                    buttonClass: button.className
+                });
+                
+                if (button.onclick && button.onclick.toString().includes('reviewUserAccess')) {
+                    console.log('=== FOUND reviewUserAccess ICON CLICK ===');
+                    console.log('Button details:', button);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+hr_user_id,first_name,last_name,email,department,department_code,job_code,title,location,employment_type,status
+1001,Alice,Nguyen,alice.nguyen@example.com,Engineering,1001,12121,Senior Engineer,US,FullTime,Terminated
+1002,Bob,Diaz,bob.diaz@example.com,Finance,1002,11232,Analyst,EU,FullTime,Terminated
+1003,Chloe,Park,chloe.park@example.com,Engineering,1001,12233,Contract Dev,US,Contractor,Active
+1004,Dan,King,dan.king@example.com,Sales,1003,12344,AE,US,FullTime,Terminated
+1005,John,Doe,john.doe@example.com,IT,1004,12345,IT Manager,US,FullTime,Active
+1006,Stephanie,Smith,stephanie.smith@example.com,Finance,1002,12355,Controller,EU,FullTime,Active
